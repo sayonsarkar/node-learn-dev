@@ -1,10 +1,30 @@
 const express = require('express');
 const ejs = require('ejs');
+const morgan = require('morgan');
 
 const app = express();
 
 //ejs
 app.set('view engine', 'ejs');
+
+//middleware & static files
+app.use(express.static('public'));
+
+app.use(morgan('dev'));
+
+app.use((req, res, next) => {
+    console.log('New request made:');
+    console.log('host: ', req.hostname);
+    console.log('path: ', req.path);
+    console.log('method: ', req.method);
+    next();
+})
+
+app.use((req, res, next) => {
+    console.log('In the next middleware');
+    next();
+}
+);
 
 app.get('/', (req, res) => {
     // res.send('Hello World!');
@@ -38,7 +58,7 @@ app.get('/blogs/create', (req, res) => {
 
 //404 page
 app.use((req, res) => {
-    res.status(404).sendFile('./views/404.html', {root: __dirname});
+    res.status(404).sendFile('./views/404.ejs', {root: __dirname});
 }
 );
 
