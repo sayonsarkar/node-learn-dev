@@ -2,7 +2,7 @@ const express = require('express');
 const ejs = require('ejs');
 const morgan = require('morgan');
 const mongoose = require('mongoose');
-const Blog = require('./models/blog');
+const blogRoutes = require('./routes/blogRoutes');
 
 const app = express();
 
@@ -17,6 +17,7 @@ app.set('view engine', 'ejs');
 
 //middleware & static files
 app.use(express.static('public'));
+app.use(express.urlencoded({extended: true}));
 
 app.use(morgan('dev'));
 
@@ -88,26 +89,12 @@ app.get('/', (req, res) => {
 app.get('/about', (req, res) => {
     // res.send('About page');
     // res.sendFile('./views/about.html', {root: __dirname});
-    res.render('about.ejs', {title: 'About'});
+    res.render('about', {title: 'About'});
 }
 );
 
 //blog routes
-app.get('/blogs', (req, res) => {
-    Blog.find().sort({createdAt: -1})
-        .then((result) => {
-            res.render('index', {title: 'All blogs', blogs: result});
-        })
-        .catch((err) => {
-            console.log(err);
-        });
-}
-);
-
-app.get('/blogs/create', (req, res) => {
-    res.render('create.ejs', {title: 'Create a new blog'});
-}
-);
+app.use('/blogs', blogRoutes);
 
 //redirects
 // app.get('/about-us', (req, res) => {
